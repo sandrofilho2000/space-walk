@@ -86,11 +86,9 @@ const get_correction_lat = (param) =>{
 }
 
 const get_iss_ship = (equatorPoints, long = 131) =>{
-    const issShipGeometry = new THREE.SphereGeometry(0.1, 32, 32);
+    const issShipGeometry = new THREE.SphereGeometry(0.030, 16, 16);
     const issShipMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
     const issShip = new THREE.Mesh(issShipGeometry, issShipMaterial);
-
-    console.log("EQUATOR POINTS: ", equatorPoints)
 
 /*     const initialPosition = equatorPoints[Math.floor(equatorPoints.length / 4)]; 
  */    
@@ -114,7 +112,8 @@ const get_latitude_line = (latitude, longitude) =>{
     const minus_position_y = position_y < 0 ? (position_y * -1) : position_y;
 
     let scale = get_scale(minus_position_y);
-
+    console.log("LONGITUDE: ", longitude)
+    console.log("LATITUDE: ", latitude)
     const equatorPoints = [];
     for (let i = 0; i <= 360; i++) {
         equatorPoints.push(new THREE.Vector3(Math.sin(i * Math.PI / 180), 0, Math.cos(i * Math.PI / 180)));
@@ -130,7 +129,7 @@ const get_latitude_line = (latitude, longitude) =>{
     equatorLine.add(issShip)
 
     // Add rotation to make the circle spin around itself by 32 degrees
-    longitude -= 80
+    longitude += 90
     const spinAngle = longitude * Math.PI / 180; // Convert degrees to radians
     equatorLine.rotation.y += spinAngle;
 
@@ -140,14 +139,14 @@ const get_latitude_line = (latitude, longitude) =>{
 export function create_iss(lat = 0, long = 0) {
     // Create the earthLines sphere
     let latitude = Math.round(lat);
-    let longitude = Math.round(long) < 0 ? Math.round(long) * 2 : Math.round(long)
+    let longitude = Math.round(long);
 
     const earthLinesGeometry = new THREE.SphereGeometry(1.1, 32, 32);
     const earthLinesMaterial = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 });
     const earthLinesMesh = new THREE.Mesh(earthLinesGeometry, earthLinesMaterial);
     earthLinesMesh.rotation.y = 90 * Math.PI / 180;
 
-    const latitude_line = get_latitude_line(-22, -44)
+    const latitude_line = get_latitude_line(latitude, longitude)
 
     earthLinesMesh.remove(latitude_line);
     earthLinesMesh.add(latitude_line);
