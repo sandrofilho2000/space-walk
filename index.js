@@ -71,7 +71,7 @@ scene.add(sunLight);
 
 
 const runThreeJs = () =>{
-  fetch('http://api.open-notify.org/iss-now.json')
+  fetch('https://api.wheretheiss.at/v1/satellites/25544')
     .then(response => {
       if (!response.ok) {
         throw new Error('Network response was not ok');
@@ -80,8 +80,8 @@ const runThreeJs = () =>{
     })
     .then(data => {
       // Handle the data here
-      let lat = data.iss_position.latitude
-      let long = data.iss_position.longitude
+      let lat = data.latitude
+      let long = data.longitude
   
       const iss = create_iss(lat, long)
       earthGroup.remove(iss)
