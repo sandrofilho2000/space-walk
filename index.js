@@ -3,6 +3,10 @@ import { OrbitControls } from 'jsm/controls/OrbitControls.js';
 
 import getStarfield from "./src/getStarfield.js";
 import { getFresnelMat } from "./src/getFresnelMat.js";
+import { create_iss } from "./src/issMove.js";
+import { createEarthLines } from "./src/earthLines.js";
+
+
 
 const w = window.innerWidth;
 const h = window.innerHeight;
@@ -26,8 +30,12 @@ const material = new THREE.MeshPhongMaterial({
   bumpMap: loader.load("./textures/01_earthbump1k.jpg"),
   bumpScale: 0.04,
 });
+
+
 const earthMesh = new THREE.Mesh(geometry, material);
 earthGroup.add(earthMesh);
+
+// Add addEarthLines() to your animate() function
 
 const lightsMat = new THREE.MeshBasicMaterial({
   map: loader.load("./textures/03_earthlights1k.jpg"),
@@ -53,29 +61,63 @@ const glowMesh = new THREE.Mesh(geometry, fresnelMat);
 glowMesh.scale.setScalar(1.01);
 earthGroup.add(glowMesh);
 
-const stars = getStarfield({numStars: 2000});
+
+const stars = getStarfield({ numStars: 2000 });
 scene.add(stars);
 
 const sunLight = new THREE.DirectionalLight(0xffffff);
 sunLight.position.set(-2, 0.5, 1.5);
 scene.add(sunLight);
 
-function animate() {
-  requestAnimationFrame(animate);
 
-  earthMesh.rotation.y += 0.002;
-  lightsMesh.rotation.y += 0.002;
-  cloudsMesh.rotation.y += 0.0023;
-  glowMesh.rotation.y += 0.002;
-  stars.rotation.y -= 0.0002;
-  renderer.render(scene, camera);
+const runThreeJs = () =>{
+  fetch('http://api.open-notify.org/iss-now.json')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(data => {
+      // Handle the data here
+      let lat = data.iss_position.latitude
+      let long = data.iss_position.longitude
+  
+      const iss = create_iss(lat, long)
+      earthGroup.remove(iss)
+      earthGroup.add(iss)
+  
+      function animate() {
+        requestAnimationFrame(animate);
+  
+        earthMesh.rotation.y += 0.002;
+        iss.rotation.y += 0.002;
+        lightsMesh.rotation.y += 0.002;
+        cloudsMesh.rotation.y += 0.0023;
+        glowMesh.rotation.y += 0.002;
+        stars.rotation.y -= 0.0002;
+  
+  
+  
+        renderer.render(scene, camera);
+      }
+  
+      animate();
+  
+      function handleWindowResize() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      }
+      window.addEventListener('resize', handleWindowResize, false);
+    })
+    .catch(error => {
+      // Handle errors here
+      console.error('There was a problem with the fetch operation:', error);
+    });
 }
 
-animate();
 
-function handleWindowResize () {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-}
-window.addEventListener('resize', handleWindowResize, false);
+runThreeJs()
+
+
