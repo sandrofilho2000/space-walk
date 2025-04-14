@@ -87,7 +87,7 @@ const get_correction_lat = (param) =>{
 
 const get_iss_ship = (equatorPoints, long = 131) =>{
     const issShipGeometry = new THREE.SphereGeometry(0.030, 16, 16);
-    const issShipMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    const issShipMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff });
     const issShip = new THREE.Mesh(issShipGeometry, issShipMaterial);
 
 /*     const initialPosition = equatorPoints[Math.floor(equatorPoints.length / 4)]; 
@@ -104,7 +104,7 @@ const get_iss_ship = (equatorPoints, long = 131) =>{
 }
 
 const get_latitude_line = (latitude, longitude) =>{
-    const equatorMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
+    const equatorMaterial = new THREE.LineBasicMaterial({ color: 0x00ff00 });
     const minus_lat = latitude < 0 ? (latitude * -1) : latitude;
     let correct_lat = get_correction_lat(minus_lat);
     correct_lat = latitude < 0 ? (correct_lat * -1) : correct_lat;
